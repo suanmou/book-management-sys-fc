@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Input, Button, Tag, List, Typography, message } from 'antd';
 import { useCallback } from 'react';
+import { SearchConfig } from '..';
 
 // 正则表达式特殊字符转义
 const escapeRegExp = (string) => {
@@ -8,14 +9,21 @@ const escapeRegExp = (string) => {
 };
 
 export const CommonSearch = ({
-  data = [],
-  dataKey = 'content',
-  defaultTitle = '未命名搜索',
-  onTitleChange,
+  config,
+  onUpdate,
+  data,
+}: {
+  config: SearchConfig;
+  onUpdate: (updates: Partial<SearchConfig>) => void;
+  data: any;
 }) => {
-  const [keywords, setKeywords] = useState([]);
+  const [keywords, setKeywords] = useState(config.keywords || []);
   const [inputValue, setInputValue] = useState('');
-  const [title, setTitle] = useState(defaultTitle);
+  const [title, setTitle] = useState(config.title);
+  const { dataKey } = config;
+  useEffect(() => {
+    onUpdate({ keywords, title });
+  }, [keywords, title]);
   // 标题修改处理
   const handleTitleEdit = (newTitle) => {
     if (!newTitle.trim()) {

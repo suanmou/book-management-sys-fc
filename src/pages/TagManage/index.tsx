@@ -1,13 +1,28 @@
 import { Button, Col, Row } from 'antd';
 import { CommonSearch } from './CommonSearch';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DeleteOutlined,
   PlusCircleOutlined,
   PlusCircleTwoTone,
 } from '@ant-design/icons';
+export type SearchConfig = {
+  id: string;
+  title: string;
+  keywords: string[];
+  dataKey: string;
+};
 // 增强版 DemoPage
 export const TagManage = () => {
+  const [configs, setConfigs] = useState<SearchConfig[]>(() => {
+    const saved = localStorage.getItem('searchConfigs');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('searchConfigs', JSON.stringify(configs));
+  }, [configs]);
+
   const [searchComponents, setSearchComponents] = useState([Date.now()]);
   const testData = [
     { id: 1, content: 'Ant Design 是一个优秀的 React UI 库' },
@@ -18,10 +33,28 @@ export const TagManage = () => {
 
   // 添加新的搜索组件
   const addSearchComponent = () => {
-    const newKey = Date.now();
-    setSearchComponents([...searchComponents, newKey]);
+    const newConfig: SearchConfig = {
+      id: Date.now().toString(),
+      title: `搜索组 ${configs.length + 1}`,
+      keywords: [],
+      dataKey: 'content',
+    };
+    setConfigs([...configs, newConfig]);
+    // const newKey = Date.now();
+    // setSearchComponents([...searchComponents, newKey]);
   };
 
+  const updateConfig = (id: string, updates: Partial<SearchConfig>) => {
+    setConfigs((prev) =>
+      prev.map((config) =>
+        config.id === id ? { ...config, ...updates } : config
+      )
+    );
+  };
+
+  const deleteConfig = (id: string) => {
+    setConfigs((prev) => prev.filter((config) => config.id !== id));
+  };
   // 移除指定搜索组件
   const removeSearchComponent = (key) => {
     setSearchComponents((prev) => prev.filter((k) => k !== key));
@@ -37,9 +70,9 @@ export const TagManage = () => {
         添加新的搜索组件
       </Button> */}
       <Row gutter={[24, 32]} justify="start">
-        {searchComponents.map((key, index) => (
+        {configs.map((config, index) => (
           <Col
-            key={key}
+            key={config.id}
             xs={24} // 超小屏幕（<576px）：1列
             sm={12} // 小屏幕（≥576px）：2列
             md={8} // 中等屏幕（≥768px）：3列
@@ -47,19 +80,23 @@ export const TagManage = () => {
             xl={6} // 超大屏幕（≥1200px）：4列
             style={{ minWidth: 300 }}
           >
-            <div key={key} style={{ position: 'relative', marginBottom: 32 }}>
+            <div
+              key={config.id}
+              style={{ position: 'relative', marginBottom: 32 }}
+            >
               <Button
                 type="link"
                 danger
                 style={{ position: 'absolute', right: 0, top: 10 }}
-                onClick={() => removeSearchComponent(key)}
+                onClick={() => deleteConfig(config.id)}
               >
                 <DeleteOutlined />
               </Button>
               <CommonSearch
+                key={config.id}
                 data={testData}
-                dataKey="content"
-                defaultTitle={`分类${index + 1}`}
+                config={config}
+                onUpdate={(updates) => updateConfig(config.id, updates)}
               />
             </div>
           </Col>
