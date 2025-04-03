@@ -12,6 +12,7 @@ export type SearchConfig = {
   keywords: string[];
   dataKey: string;
 };
+import Chat from './Chat';
 // 增强版 DemoPage
 export const TagManage = () => {
   const [configs, setConfigs] = useState<SearchConfig[]>(() => {
@@ -62,6 +63,7 @@ export const TagManage = () => {
 
   return (
     <div style={{ padding: 24 }}>
+      <Chat></Chat>
       {/* <Button
         type="primary"
         onClick={addSearchComponent}
@@ -69,7 +71,7 @@ export const TagManage = () => {
       >
         添加新的搜索组件
       </Button> */}
-      <Row gutter={[24, 32]} justify="start">
+      <Row gutter={[24, 32]} justify="start" style={{ marginTop: '24px' }}>
         {configs.map((config, index) => (
           <Col
             key={config.id}
