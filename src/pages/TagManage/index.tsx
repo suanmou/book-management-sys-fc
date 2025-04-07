@@ -12,7 +12,7 @@ export type SearchConfig = {
   keywords: string[];
   dataKey: string;
 };
-import Chat from './Chat';
+import Chat from './ChatWindow';
 // 增强版 DemoPage
 export const TagManage = () => {
   const [configs, setConfigs] = useState<SearchConfig[]>(() => {
@@ -99,6 +99,7 @@ export const TagManage = () => {
                 data={testData}
                 config={config}
                 onUpdate={(updates) => updateConfig(config.id, updates)}
+                showDateFilter={true}
               />
             </div>
           </Col>
